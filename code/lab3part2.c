@@ -26,6 +26,9 @@ int main(int argc, char* argv[]) {
    double  a, b;                 /* Left and right endpoints      */
    int     n;                    /* Total number of trapezoids    */
    int     thread_count;
+   double start_time, finish_time, elapsed_time;
+
+   start_time = omp_get_wtime();
 
    thread_count = strtol(argv[1], NULL, 10);
    printf("Enter a, b, and n\n");
@@ -33,9 +36,13 @@ int main(int argc, char* argv[]) {
 
    global_result = Trap(a, b, n, thread_count);
 
+   finish_time = omp_get_wtime();
+   elapsed_time = finish_time - start_time;
+
    printf("With n = %d trapezoids, our estimate\n", n);
    printf("of the integral from %f to %f = %.14e\n",
       a, b, global_result);
+   printf("This took %.3f seconds\n", elapsed_time);
    return 0;
 }  /* main */
 
@@ -69,6 +76,7 @@ double Trap(double a, double b, int n, int thread_count) {
 
    h = (b-a)/n; 
    approx = (f(a) + f(b))/2.0; 
+   #pragma omp parallel for num_threads(thread_count) reduction(+: approx)
    for (i = 1; i <= n-1; i++)
      approx += f(a + i*h);
    approx = h*approx; 

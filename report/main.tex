@@ -45,8 +45,19 @@
 
 \begin{document}
 
+\pagenumbering{gobble}
 \maketitle % Print the title
+\newpage
+\tableofcontents
+\newpage
 
-\input{sections/section_1.tex} % Monte Carlo's extimation of Pi using POSIX's pthreads	
+\pagenumbering{arabic}
+\input{sections/section_1.tex} % Monte Carlo's extimation of Pi using OpenMP
+\pagebreak
+\input{sections/section_2.tex} % Trapezoidal rule to approximate area under a function f(x)=x^3 using OpenMP
+\pagebreak
+\input{sections/section_3.tex} % Parallel histogram generation using OpenMP
+\pagebreak
+\input{sections/section_4.tex} % Parallel count sort using OpenMP
 
 \end{document}

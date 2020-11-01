@@ -41,4 +41,40 @@ run the section of code assigned by the OpenMP directives - line 2 - 15.
 
 \subsubsection{Where barrires if any in terms of thread synchronization would be encountered,
 and hence how the code achives parallelization}
-write something
+
+Thread synchronization is needed to so reduction can be apply to the variable
+\emph{number\_in\_circle} to avoid race condition. OpenMP's reduction basically
+behaves similarly to a critical section in terms of synchronisation.
+
+
+\subsection{Tabulate the speedup and efficiency for 1,2,4,8 threads.}
+
+\begin{center}
+\begin{tabular}{|| c | c | c | c ||}
+	\hline
+	Threads & Time (s) & Speedup & Efficiency (\%) \\ [0.5ex]
+	\hline 
+	1 & 20.356 & N/A & 100 \\
+	2 & 10.376 & 1.962 & 98.10 \\
+	4 & 5.908 & 3.476 & 86.90 \\
+	8 & 3.498 & 5.819 & 72.74 \\
+	\hline
+\end{tabular}
+\end{center}
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{graphics/P1_c_terminal_output.PNG}
+	\caption{Terminal output for execution with 1, 2, 4, 8 threads respectively for
+	estimating $pi$ using Monte Carlo's method with $10^9$ samples}
+	\label{fig:lab3part1c}
+\end{figure}
+
+\subsubsection{Do the result match your expectation? Why?}
+
+The result matches our expectation. The speedup will increase as the number
+of threads increase but will saturate at somepoint due to Amdahl's Law which
+states that the parallel program is bounded by the section of code that 
+can only be executed in serial. Hence, even though we are allocating more
+threads, the efficiency decreases and we get a diminishing return due to this
+fact.

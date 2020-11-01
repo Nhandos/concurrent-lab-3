@@ -22,11 +22,11 @@
 int main(int argc, char* argv[]) {
    double pi_estimate;
    int thread_count;
-   double start, finished, elapsed;
+   double start_time, finish_time, elapse_time;
    long long int number_in_circle;
    long long int number_of_tosses;
    
-   GET_TIME(start);
+   start_time = omp_get_wtime();
    thread_count = strtol(argv[1], NULL, 10);  
    number_of_tosses = strtoll(argv[2], NULL, 10);
    
@@ -48,10 +48,10 @@ int main(int argc, char* argv[]) {
    }
 
    pi_estimate = 4*number_in_circle/((double) number_of_tosses);
-   GET_TIME(finished);
-   elapsed = finished - start;
+   finish_time = omp_get_wtime();
+   elapse_time = finish_time - start_time;
    printf("Estimated pi: %e\n", pi_estimate);
-   printf("Time = %8.5e seconds\n", elapsed);
+   printf("This took %.3f seconds\n", elapse_time);
 
    return 0;
 }

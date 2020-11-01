@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <omp.h>
+#include "timer.h"
 
 void Usage(char prog_name[]);
 
@@ -69,11 +70,14 @@ int main(int argc, char* argv[]) {
    int data_count;
    float* data;
    int thread_count;
+   double start_time, finish_time, elasped_time;
    
    /* Check and get command line args */
    if (argc != 6) Usage(argv[0]); 
    Get_args(argv, &bin_count, &min_meas, &max_meas, &data_count, 
          &thread_count);
+
+   start_time = omp_get_wtime();
 
    /* Allocate arrays needed */
    bin_maxes = malloc(bin_count*sizeof(float));
@@ -89,10 +93,12 @@ int main(int argc, char* argv[]) {
    memset(loc_bin_counts, 0, thread_count*bin_count*sizeof(int));
 
    /* Count number of values in each bin */
+   #pragma omp parallel num_threads(thread_count)
    {
       int j, my_rank = omp_get_thread_num();
       int my_offset = my_rank*bin_count;
 
+      #pragma omp for private(bin)
       for (i = 0; i < data_count; i++) {
          my_rank = omp_get_thread_num();
          bin = Which_bin(data[i], bin_maxes, bin_count, min_meas);
@@ -102,6 +108,7 @@ int main(int argc, char* argv[]) {
          loc_bin_counts[my_offset + bin]++;
       }
 
+      #pragma omp for
       for (i = 0; i < bin_count; i++)
          for (j = 0; j < thread_count; j++) {
 #           ifdef DEBUG
@@ -118,8 +125,11 @@ int main(int argc, char* argv[]) {
    printf("\n");
 #  endif
 
-   /* Print the histogram */
-   Print_histo(bin_maxes, bin_counts, bin_count, min_meas);
+   /* Print the histogram */ // Disable output routine for large number of data point
+/*   Print_histo(bin_maxes, bin_counts, bin_count, min_meas); */
+   finish_time = omp_get_wtime();
+   elasped_time = finish_time - start_time;
+   printf("This took %.3f seconds \n", elasped_time);
 
    free(data);
    free(bin_maxes);
@@ -188,7 +198,10 @@ void Gen_data(
         float   data[]      /* out */,
         int     data_count  /* in  */) {
    int i;
+   int seed;
 
+/*   GET_TIME(seed); */
+   /*srandom(seed);*/
    srandom(0);
    for (i = 0; i < data_count; i++)
       data[i] = min_meas + (max_meas - min_meas)*random()/((double) RAND_MAX);
