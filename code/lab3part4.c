@@ -175,6 +175,7 @@ void Count_sort_parallel(int a[], int n, int thread_count) {
    int i, j, count;
    int* temp = malloc(n*sizeof(int));
 
+      #pragma omp parallel for num_threads(thread_count) shared(temp, a) private(i, j, count)
       for (i = 0; i < n; i++) {
          count = 0;
          for (j = 0; j < n; j++) 

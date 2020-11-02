@@ -125,7 +125,9 @@ void Gaussian_elim(double A[], double b[], int n, int thread_count){
    int i, j, k;
    double fact;
 
+#pragma omp parallel num_threads(thread_count) private(i, k, j, fact)
    for (i = 0; i < n-1; i++)
+#pragma omp for
       for (k = i+1; k < n; k++) {
          fact = -A[k*n + i]/A[i*n + i];
          A[k*n + i] = 0;
@@ -145,10 +147,14 @@ void Row_solve(double A[], double b[], double x[], int n, int thread_count) {
    int i, j;
    double tmp;
 
+#pragma omp parallel num_threads(thread_count) private(i, j) shared(tmp)
    for (i = n-1; i >= 0; i--) {
+      #pragma omp single
       tmp = b[i];
+      #pragma omp for reduction(+: tmp)
       for (j = i+1; j < n; j++)
          tmp += -A[i*n+j]*x[j];
+      #pragma omp single
       {
          x[i] = tmp/A[i*n+i];
 #        ifdef DEBUG
